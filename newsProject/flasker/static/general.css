@@ -1,0 +1,45 @@
+.multiline-5 {
+    display: -webkit-box !important;
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+    word-break: break-all;
+
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 5;
+}
+
+.multiline-4 {
+    display: -webkit-box !important;
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+    word-break: break-all;
+
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+}
+
+.font-l {
+    font-size: 1.6rem
+}
+
+.font-m {
+    font-size: 1.4rem
+}
+
+.font-s {
+    font-size: 1.2rem;
+}
+
+@media (min-width: 1000px) {
+    .invisible-desktop {
+        display: none !important;
+    }
+}
+
+@media (max-width: 1000px) {
+    .invisible-phone {
+        display: none !important;
+    }
+}

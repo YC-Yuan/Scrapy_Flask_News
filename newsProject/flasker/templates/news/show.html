@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>{{ data.title }}</title>
+
+</head>
+<body>
+
+{#导航栏#}
+{% include '/public/navigation.html' %}
+
+{#新闻内容#}
+{#手机版本#}
+<div class="invisible-desktop w-100" style="width: 18rem;">
+    <div class="card-body">
+        {#标签展示区#}
+        {% for tag in data.tags %}
+            {% if loop.index<5 %}
+                <button type="button" class="btn btn-outline-info disabled mb-2">{{ tag }}</button>
+            {% endif %}
+        {% endfor %}
+        <h5 class="card-title mt-2">{{ data.title }}</h5>
+        <h6 class="card-subtitle mb-2 text-muted">来自：{{ data.author }}</h6>
+        <h6 class="card-subtitle mb-2 text-muted">发布：{{ data.time }}</h6>
+        {% for paragraph in data.content %}
+            <p class="card-text">{{ paragraph }}</p>
+        {% endfor %}
+        <a href="{{ data.url }}">图片、视频请至原网站阅读</a>
+        {#数据维护者修改#}
+        {% if permission>1 %}
+            <div class="card-text text-center mb-3">
+                {# 标签展示&删除 #}
+                <input type="text" class="form-control my-3" placeholder="点击可删除标签"
+                       aria-label="点击可删除标签" disabled>
+                {% for tag in data.tags %}
+                    {# 确认框触发按钮 #}
+                    <button type="button" class="btn btn-outline-danger mb-2" data-toggle="modal"
+                            data-target="#phone-modal{{ tag }}">
+                        <span>{{ tag }}</span>
+                    </button>
+                {% endfor %}
+                {% for tag in data.tags %}
+                    <!-- 确认框 -->
+                    <div class="modal fade" id="phone-modal{{ tag }}" tabindex="-1" role="dialog"
+                         aria-labelledby="{{ tag }}" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="{{ tag }}">删除文章标签</h5>
+                                    <button type="button" class="close" data-dismiss="modal"
+                                            aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">删除与文章无关或不重要的标签(无法恢复！)</div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-outline-secondary"
+                                            data-dismiss="modal">关闭
+                                    </button>
+                                    <a href="/news/delete_tag/{{ data._id }}/{{ tag }}">
+                                        <button type="button" class="btn btn-outline-danger">确认删除</button>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+                {# 标签输入&添加 #}
+                <form class="input-group mb-3" action="/news/add_tag/{{ data._id }}" method="get">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">添加标签</span>
+                    </div>
+                    <input type="text" class="form-control" placeholder="输入标签"
+                           name="tag_name" aria-label="标签">
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-outline-success">添加标签</button>
+                    </div>
+                </form>
+                <form class="mb-3" action="/news/change_info/{{ data._id }}">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="publisher">发布者</label>
+                        </div>
+                        <select class="custom-select" id="publisher" name="author">
+                            <option selected value="{{ data.author }}">{{ data.author }}</option>
+                            {% for author in authors %}
+                                <option value="{{ author }}">{{ author }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="category">类别</label>
+                        </div>
+                        <select class="custom-select" id="category" name="category">
+                            <option selected value="{{ data.category }}">{{ data.category }}</option>
+                            {% for category in categories %}
+                                <option value="{{ category }}">{{ category }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="stock">股票代码</label>
+                        </div>
+                        <select class="custom-select" id="stock" name="stock">
+                            <option selected value="{{ data.stock }}">{{ data.stock }}</option>
+                            {% for stock in stocks %}
+                                <option value="{{ stock }}">{{ stock }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="input-group-append">
+                        </div>
+                        <button type="submit" class="btn btn-outline-success">提交修改</button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-text text-center">
+                <!-- Button trigger modal -->
+                <button type="button" class="btn btn-outline-danger" data-toggle="modal"
+                        data-target="#deleteModal-phone">删除
+                </button>
+                <!-- Modal -->
+                <div class="modal fade" id="deleteModal-phone" tabindex="-1" role="dialog">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">删除新闻</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                删除整篇文章(无法恢复！)
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">关闭
+                                </button>
+                                <a href="/news/delete/{{ data._id }}">
+                                    <button type="button" class="btn btn-outline-danger">确认删除</button>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{#电脑版本#}
+<div class="container invisible-phone">
+    <div class="row">
+        <div class="col-12 justify-content-center">
+            <div class="card mx-auto my-3 w-100" style="width: 18rem;">
+                <div class="card-body">
+                    <button type="button"
+                            class="btn btn-outline-success disabled">{{ data.author }}</button>
+                    <button type="button"
+                            class="btn btn-outline-warning disabled">{{ data.category }}</button>
+                    <button type="button"
+                            class="btn btn-outline-secondary disabled">{{ data.stock }}</button>
+                    {#标签展示区#}
+                    {% for tag in data.tags %}
+                        {% if loop.index<11 %}
+                            <button type="button" class="btn btn-outline-info disabled">{{ tag }}</button>
+                        {% endif %}
+                    {% endfor %}
+                    <h5 class="card-title mt-2">{{ data.title }}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">来自：{{ data.author }}</h6>
+                    <h6 class="card-subtitle mb-2 text-muted">发布：{{ data.time }}</h6>
+                    {% for paragraph in data.content %}
+                        <p class="card-text">{{ paragraph }}</p>
+                    {% endfor %}
+                    <a href="{{ data.url }}">图片、视频请至原网站阅读</a>
+                    {#数据维护者修改#}
+                    {% if permission>1 %}
+                        <div class="card-text text-center my-3">
+                            {# 标签展示&删除 #}
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control" placeholder="点击可删除标签"
+                                       aria-label="点击可删除标签" disabled>
+                                <div class="input-group-append">
+                                    {% for tag in data.tags %}
+                                        {# 确认框触发按钮 #}
+                                        <button type="button" class="btn btn-outline-danger" data-toggle="modal"
+                                                data-target="#desktop-modal{{ tag }}">
+                                            <span>{{ tag }}</span>
+                                        </button>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% for tag in data.tags %}
+                                <!-- 确认框 -->
+                                <div class="modal fade" id="desktop-modal{{ tag }}" tabindex="-1" role="dialog"
+                                     aria-labelledby="{{ tag }}" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="{{ tag }}">删除文章标签</h5>
+                                                <button type="button" class="close" data-dismiss="modal"
+                                                        aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">删除与文章无关或不重要的标签(无法恢复！)</div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-outline-secondary"
+                                                        data-dismiss="modal">关闭
+                                                </button>
+                                                <a href="/news/delete_tag/{{ data._id }}/{{ tag }}">
+                                                    <button type="button" class="btn btn-outline-danger">确认删除</button>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                            {# 标签输入&添加 #}
+                            <form class="input-group mb-3" action="/news/add_tag/{{ data._id }}" method="get">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">可选择标签添加</span>
+                                </div>
+                                <select class="custom-select" id="tag_category" disabled>
+                                    <option selected>选择标签的类型</option>
+                                    <option value="21">发布者</option>
+                                    <option value="22">类别</option>
+                                    <option value="23">关键词</option>
+                                    <option value="90">股票代码</option>
+                                </select>
+                                <input type="text" class="form-control" placeholder="输入标签"
+                                       name="tag_name" aria-label="标签">
+                                <div class="input-group-append">
+                                    <button type="submit" class="btn btn-outline-success">添加标签</button>
+                                </div>
+                            </form>
+                            <form class="input-group" action="/news/change_info/{{ data._id }}">
+                                <div class="input-group-prepend">
+                                    <label class="input-group-text" for="publisher">发布者</label>
+                                </div>
+                                <select class="custom-select" id="publisher" name="author">
+                                    <option selected value="{{ data.author }}">{{ data.author }}</option>
+                                    {% for author in authors %}
+                                        <option value="{{ author }}">{{ author }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="input-group-prepend">
+                                    <label class="input-group-text" for="category">类别</label>
+                                </div>
+                                <select class="custom-select" id="category" name="category">
+                                    <option selected value="{{ data.category }}">{{ data.category }}</option>
+                                    {% for category in categories %}
+                                        <option value="{{ category }}">{{ category }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="input-group-prepend">
+                                    <label class="input-group-text" for="stock">股票代码</label>
+                                </div>
+                                <select class="custom-select" id="stock" name="stock">
+                                    <option selected value="{{ data.stock }}">{{ data.stock }}</option>
+                                    {% for stock in stocks %}
+                                        <option value="{{ stock }}">{{ stock }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="input-group-append">
+                                    <button type="submit" class="btn btn-outline-success">提交修改</button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="card-text text-center">
+                            <!-- Button trigger modal -->
+                            <button type="button" class="btn btn-outline-danger" data-toggle="modal"
+                                    data-target="#deleteModal">删除
+                            </button>
+                            <!-- Modal -->
+                            <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLabel">删除新闻</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            删除整篇文章(无法恢复！)
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-outline-secondary"
+                                                    data-dismiss="modal">关闭
+                                            </button>
+                                            <a href="/news/delete/{{ data._id }}">
+                                                <button type="button" class="btn btn-outline-danger">确认删除</button>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

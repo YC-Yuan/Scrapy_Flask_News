@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>衍复资讯</title>
+
+</head>
+<body>
+
+{#导航栏#}
+{% include '/public/navigation.html' %}
+
+{#推荐新闻#}
+{#手机版#}
+<div class="mx-auto w-100 invisible-desktop">
+    <div class="card-header text-center font-l">资讯推荐</div>
+    <ul class="list-group list-group-flush">
+        {% for news in data %}
+            <li class="list-group-item p-0">
+                <a href="/news/show/{{ news._id }}" class="text-decoration-none text-body">
+                    <div class="card-body p-2">
+                        <h5 class="card-title font-m">{{ news.title }}</h5>
+                        <span class="card-subtitle mb-2 text-muted">{{ news.author }}</span>
+                        <span class="card-subtitle mb-2 text-muted">{{ news.time|time_display }}</span>
+                        <p class="card-text multiline-4 font-s">{{ news.abstract }}</p>
+                        <button type="button" class="btn btn-outline-warning disabled mb-2 ml-1">{{ news.category }}</button>
+                        <button type="button" class="btn btn-outline-secondary disabled mb-2 ml-1">{{ news.stock }}</button>
+                        {% for tag in news.tags %}
+                            {% if loop.index<3 %}
+                                <button type="button" class="btn btn-outline-info disabled mb-2 ml-1">{{ tag }}</button>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+{#电脑版#}
+<div class="container invisible-phone">
+    <div class="row">
+        <div class="col-12 justify-content-center">
+            <div class="card mx-auto my-3 w-100" style="width: 18rem;">
+                <div class="card-header">资讯推荐</div>
+                <ul class="list-group list-group-flush">
+                    {% for news in data %}
+                        <li class="list-group-item">
+                            <a href="/news/show/{{ news._id }}" class="text-decoration-none text-body">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ news.title }}</h5>
+                                    <span class="card-subtitle mb-2 text-muted">{{ news.author }}</span>
+                                    <span class="card-subtitle mb-2 text-muted">{{ news.time|time_display }}</span>
+                                    <p class="card-text multiline-4">{{ news.abstract }}</p>
+                                    <button type="button"
+                                            class="btn btn-outline-success disabled">{{ news.author }}</button>
+                                    <button type="button"
+                                            class="btn btn-outline-warning disabled">{{ news.category }}</button>
+                                    <button type="button"
+                                            class="btn btn-outline-secondary disabled">{{ news.stock }}</button>
+                                    {% for tag in news.tags %}
+                                        {% if loop.index<11 %}
+                                            <button type="button"
+                                                    class="btn btn-outline-info disabled">{{ tag }}</button>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{#分页#}
+<nav aria-label="Page navigation" class="my-1">
+    <ul class="pagination justify-content-center">
+        <li class="page-item {% if page==1 %}
+        disabled {% endif %}"><a class="page-link" href="/news/recommend/1">First</a></li>
+        {% set range_list= page|page_range(page_num) %}
+        {% for i in range(range_list[0],range_list[1] + 1) %}
+            <li class="page-item {% if i==page %}
+            active
+            {% endif %}"><a class="page-link" href="/news/recommend/{{ i }}">{{ i }}</a></li>
+        {% endfor %}
+        <li class="page-item {% if page==page_num %}
+        disabled {% endif %}"><a class="page-link" href="/news/recommend/{{ page_num }}">Last</a></li>
+    </ul>
+</nav>
+
+</body>
+</html>

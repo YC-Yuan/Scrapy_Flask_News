@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>注册</title>
+
+</head>
+<body>
+
+{#失败提示#}
+{% if message %}
+    <script>alert('{{ message }}')</script>
+{% endif %}
+
+{#导航栏#}
+{% include '/public/navigation.html' %}
+
+{# 注册表单 #}
+<div class="container">
+    <div class="row mt-5">
+        <div class="col">
+            <div class="card border-dark mx-auto" style="max-width: 20rem;">
+                <div class="card-header">注册</div>
+                <form action="./register_handle" method="post" class="p-3">
+                    <div class="form-group">
+                        <label for="email">电子邮箱</label>
+                        <input type="email" class="form-control" id="email" aria-describedby="emailHelp"
+                               placeholder="请输入邮箱" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">密码</label>
+                        <input type="password" class="form-control" id="password" placeholder="请输入密码" name="password"
+                               required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password_confirm">确认密码</label>
+                        <input type="password" class="form-control" id="password_confirm" placeholder="请确认密码"
+                               name="password_confirm"
+                               required>
+                    </div>
+                    <button type="submit" id="submit" class="btn btn-primary">注册</button>
+                    <a class="text-secondary" href="../../users/login">已有账号，直接登录</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+
+
+<script src="../../static/register_validity.js"></script>
+</html>

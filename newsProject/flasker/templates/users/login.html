@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>登录</title>
+
+</head>
+<body>
+
+{#失败提示#}
+{% if message %}
+    <script>alert('{{ message }}')</script>
+{% endif %}
+
+{#导航栏#}
+{% include '/public/navigation.html' %}
+
+{# 登录表单 #}
+<div class="container">
+    <div class="row mt-5">
+        <div class="col">
+            <div class="card border-dark mx-auto" style="max-width: 20rem;">
+                <div class="card-header">登录</div>
+                <form action="/users/login_handle" method="post" class="p-3">
+                    <div class="form-group">
+                        <label for="email">电子邮箱</label>
+                        <input type="email" class="form-control" id="email" aria-describedby="emailHelp"
+                               placeholder="请输入邮箱" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">密码</label>
+                        <input type="password" class="form-control" id="password" placeholder="请输入密码" name="password"
+                               required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">登录</button>
+                    <a class="text-secondary" href="../../users/register">还没有账号?去注册</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>全库检索</title>
+
+    <!--bootstrap4-->
+    <link rel="stylesheet" type="text/css" href="/static/bootstrap-4.4.1/css/bootstrap.min.css">
+    <script src="/static/bootstrap-4.4.1/jquery-3.5.1.js"></script>
+    <script src="/static/bootstrap-4.4.1/popper.js"></script>
+    <script src="/static/bootstrap-4.4.1/js/bootstrap.min.js"></script>
+
+    {# 日期选择组件的js #}
+    <script src="/static/date_range_picker.js"></script>
+
+
+</head>
+<body>
+
+{#导航栏#}
+{% include '/public/navigation.html' %}
+
+{#全库新闻#}
+<form class="accordion p-0 px-lg-3 mt-lg-3 container-lg" id="form-desktop" action="/news/search" method="post">
+    {# 选择栏 #}
+    {# 需要保留状态 #}
+    <div class="card">
+        {# 时间范围选择组件 #}
+        <div class="input-group p-1" id="date-picker">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon">时间范围</span>
+            </div>
+            <input type="text" id="date-range" class="form-control" readonly
+                   aria-describedby="basic-addon" style="background-color: white" name="time_range"
+                    {% if 'time_range' in form %}
+                   value="{{ form['time_range'] }}"
+                    {% else %}
+                   value='2021/01/01 - 2021/01/01'>
+                    {% endif %}
+            <i id="calendar-icon" class="fa fa-calendar"></i>
+        </div>
+        {# 排序方式选择组件 #}
+        <div class="input-group p-1">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon2">排序方式</span>
+            </div>
+            <select class="form-control p-1" aria-describedby="basic-addon2" name="order">
+                <option value="by_time" {% if 'order' in form and form['order'] == 'by_time' %}
+                        selected
+                {% endif %} >先看最近
+                </option>
+                <option value="by_time_reverse" {% if 'order' in form and form['order'] == 'by_time_reverse' %}
+                        selected
+                {% endif %}>先看最早
+                </option>
+            </select>
+        </div>
+        {# tag选项分类区 #}
+        <div class="d-flex justify-content-center">
+            {% for category_index in tag_lists %}
+                <button class="btn btn-outline-info collapsed m-1" type="button" data-toggle="collapse"
+                        data-target="#collapse{{ loop.index }}"
+                        aria-expanded="true" aria-controls="collapseOne">
+                    {{ id_tag_category_map[category_index] }}
+                </button>
+            {% endfor %}
+            <button class="btn btn-primary m-1 ml-auto" type="submit">检索</button>
+        </div>
+    </div>
+    {# 选项区 #}
+    <div class="card">
+        {% for category_index in tag_lists %}
+            <div id="collapse{{ loop.index }}" class="collapse" data-parent="#form-desktop">
+                <div class="card-body pre-scrollable">
+                    {% for tag in tag_lists[category_index] %}
+                        <div class="form-check-inline">
+                            <input class="form-check-input" name="search_words" type="checkbox" value="{{ tag }}"
+                                   id="{{ tag }}" {% if  'search_words' in form and tag in form['search_words'] %}
+                                   checked
+                            {% endif %} >
+                            <label class="form-check-label" for="{{ tag }}">{{ tag }}</label>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</form>
+
+{#手机版#}
+<div class="mx-auto w-100 invisible-desktop">
+    <div class="card-header text-center font-l">资讯推荐</div>
+    <ul class="list-group list-group-flush">
+        {% for news in data %}
+            <li class="list-group-item p-0">
+                <a href="/news/show/{{ news._id }}" class="text-decoration-none text-body">
+                    <div class="card-body p-2">
+                        <h5 class="card-title font-m">{{ news.title }}</h5>
+                        <span class="card-subtitle mb-2 text-muted">{{ news.author }}</span>
+                        <span class="card-subtitle mb-2 text-muted">{{ news.time|time_display }}</span>
+                        <p class="card-text multiline-4 font-s">{{ news.abstract }}</p>
+                        <button type="button" class="btn btn-outline-warning disabled mb-2 ml-1">{{ news.category }}</button>
+                        <button type="button" class="btn btn-outline-secondary disabled mb-2 ml-1">{{ news.stock }}</button>
+                        {% for tag in news.tags %}
+                            {% if loop.index<3 %}
+                                <button type="button" class="btn btn-outline-info disabled mb-2 ml-1">{{ tag }}</button>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+
+
+{#电脑版#}
+<div class="container invisible-phone">
+    <div class="row">
+        <div class="col-12 justify-content-center">
+            <div class="card mx-auto my-3 w-100" style="width: 18rem;">
+                <div class="card-header">全库检索</div>
+                <ul class="list-group list-group-flush">
+                    {% for news in data %}
+                        <li class="list-group-item">
+                            <a href="/news/show/{{ news._id }}" class="text-decoration-none text-body">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ news.title }}</h5>
+                                    <span class="card-subtitle mb-2 text-muted">{{ news.author }}</span>
+                                    <span class="card-subtitle mb-2 text-muted">{{ news.time|time_display }}</span>
+                                    <p class="card-text multiline-4">{{ news.abstract }}</p>
+                                    <button type="button"
+                                            class="btn btn-outline-success disabled">{{ news.author }}</button>
+                                    <button type="button"
+                                            class="btn btn-outline-warning disabled">{{ news.category }}</button>
+                                    <button type="button"
+                                            class="btn btn-outline-secondary disabled">{{ news.stock }}</button>
+                                    {% for tag in news.tags %}
+                                        {% if loop.index<11 %}
+                                            <button type="button"
+                                                    class="btn btn-outline-info disabled">{{ tag }}</button>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{#分页#}
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+        <li class="page-item {% if page==1 %}
+        disabled {% endif %}"><a class="page-link" value="1" href="#">First</a></li>
+        {% set range_list= page|page_range(page_num) %}
+        {% for i in range(range_list[0],range_list[1] + 1) %}
+            <li class="page-item {% if i==page %}
+            active
+            {% endif %}"><a class="page-link" value="{{ i }}" href="#">{{ i }}</a></li>
+        {% endfor %}
+        <li class="page-item {% if page==page_num %}
+        disabled {% endif %}">
+            <a class="page-link" value="{{ page_num }}" href="#">Last</a>
+        </li>
+    </ul>
+</nav>
+{# 页面跳转的js #}
+<script src="/static/page_for_search.js"></script>
+</body>
+</html>
